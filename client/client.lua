@@ -13,16 +13,20 @@ end)
 -- Events & Functions -- 
 RegisterNetEvent('bodybag:bagPlayer')
 AddEventHandler('bodybag:bagPlayer', function()
-    local nearestPlayer, nearestCoords = GetClosestPlayer(2.5)
+    local nearestEntity, nearestCoords, isPlayer = GetClosestEntity(2.5)
 
-    if not nearestPlayer then showAlert("There is no player nearby", 3500) return end
+    if not nearestEntity then showAlert("There is no entity nearby", 3500) return end
 
-    if IsPlayerDead(nearestPlayer) then 
+    if IsEntityDead(nearestEntity) then
         BodyBagAnimation(PlayerPedId())
-    TriggerServerEvent('bodybag:Bag', GetPlayerServerId(nearestPlayer))
-    TriggerEvent('bodybag:spawnbag', nearestCoords)
-    else
-        showAlert("There is no player nearby that is dead", 3500)
+        
+        if isPlayer then 
+                TriggerServerEvent('bodybag:Bag', GetPlayerServerId(nearestPlayer))
+        end 
+
+        TriggerEvent('bodybag:spawnbag', nearestCoords)
+    else 
+        showAlert("There is no entity nearby that is dead", 3500)
     end
 end)
 
@@ -36,36 +40,71 @@ AddEventHandler('bodybag:spawnbag', function(coords)
     SpawnBagModel(coords)
 end)
 
-function GetClosestPlayer(maxDistance)
-    local players = GetActivePlayers() 
-    local ped = GetPlayerPed(-1)
+
+function GetClosestEntity(maxDistance)
+    local ped = PlayerPedId()
     local coords = GetEntityCoords(ped) 
-    local closestPlayer 
-   
-    for i,v in ipairs(players) do 
-       local target = GetPlayerPed(v) 
-   
-       if target ~= ped then 
-        targetCoords = GetEntityCoords(target) 
-       local distance = Vdist(targetCoords.x, targetCoords.y, targetCoords.z, coords.x, coords.y, coords.z)
-   
-       if distance < maxDistance then
-           closestPlayer = v
-               end
+    local closestEntity
+    local closestDistance = maxDistance
+    local isPlayer = false 
+
+    for _v in ipairs(GetActivePlayers()) do 
+        local targetPed = GetPlayerPed(player)
+        if targetPed ~= ped and IsEntityDead(targetPed) then 
+            local targetCoords = GetEntityCoords(targetPed)
+            local distance = #(coords - targetCoords)
+            if distance < closestDistance then 
+                closestDistance = distance
+                closestEntity = targetPed
+                isPlayer = true 
             end
-       end
-       return closestPlayer, targetCoords
-   end
+        end
+    end 
+
+    for pedHandle in EnumeratePeds() do 
+        if not IsPedAPlayer(pedHandle) and IsEntityDead(pedHandle) then 
+            local pedCoords = GetEntityCoords(pedHandle)
+            local distance = #(coords - pedCoords)
+            if distance < closestDistance then
+                closestDistance = distance 
+                closestEntity = pedHandle
+                isPlayer = false 
+            end
+        end
+    end
+    return closestEntity, GetEntityCoords(closestEntity), isPlayer
+end
+
+function EnumeratePeds() 
+    return coroutine.wrap(function()
+        local handle, ped = FindFirstPed()
+        if not handle then return end 
+        local success 
+        repeat 
+            coroutine.yield(ped)
+            success, ped = FindNextPed(handle)
+        until not success 
+        EndFindPed(handle)
+    end)
+end 
 
 function TeleportPed(ped, destination)
+    if not DoesEntityExist(ped) then return end 
+
         ClearPedTasks(ped)
         DoScreenFadeOut(1000)
         SetEntityCoords(ped, destination.x, destination.y, destination.z, false, true, true, false)
         Wait(1000)
         DoScreenFadeIn(250)
+
+        if IsPedAPlayer(ped) then 
         NetworkResurrectLocalPlayer(Config.hospitalCoords, true, true, false)
         SetEntityVisible(ped, true, true)
         SetEntityHealth(ped, 0)
+        else 
+         SetEntityHealth(ped, 0)
+        SetPedDiesWhenInjured(ped, true)
+    end
 end
 
 function BodyBagAnimation(ped)
