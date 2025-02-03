@@ -44,12 +44,12 @@ end)
 function GetClosestEntity(maxDistance)
     local ped = PlayerPedId()
     local coords = GetEntityCoords(ped) 
-    local closestEntity
+    local closestEntity = nil
     local closestDistance = maxDistance
     local isPlayer = false 
 
-    for _v in ipairs(GetActivePlayers()) do 
-        local targetPed = GetPlayerPed(player)
+    for _, v in ipairs(GetActivePlayers()) do 
+        local targetPed = GetPlayerPed(v)
         if targetPed ~= ped and IsEntityDead(targetPed) then 
             local targetCoords = GetEntityCoords(targetPed)
             local distance = #(coords - targetCoords)
@@ -61,8 +61,9 @@ function GetClosestEntity(maxDistance)
         end
     end 
 
+    -- Check NPCs
     for pedHandle in EnumeratePeds() do 
-        if not IsPedAPlayer(pedHandle) and IsEntityDead(pedHandle) then 
+        if DoesEntityExist(pedHandle) and not IsPedAPlayer(pedHandle) and IsEntityDead(pedHandle) then 
             local pedCoords = GetEntityCoords(pedHandle)
             local distance = #(coords - pedCoords)
             if distance < closestDistance then
@@ -72,7 +73,12 @@ function GetClosestEntity(maxDistance)
             end
         end
     end
-    return closestEntity, GetEntityCoords(closestEntity), isPlayer
+
+    if closestEntity then
+        return closestEntity, GetEntityCoords(closestEntity), isPlayer
+    else
+        return nil, nil, false
+    end
 end
 
 function EnumeratePeds() 
@@ -114,7 +120,7 @@ function BodyBagAnimation(ped)
 end
 
 function SpawnBagModel(coords)
-    hash = `xm_prop_body_bag`
+    local hash = `xm_prop_body_bag`
     RequestModel(hash)
     while not HasModelLoaded(hash) do 
         Wait(1)
@@ -130,6 +136,7 @@ function BodyBag()
 end 
 
 function DeleteBodyBag()
+    local hash = `xm_prop_body_bag`
     if bodyBag then 
         BodyBagAnimation(PlayerPedId())
         SetModelAsNoLongerNeeded(hash)
