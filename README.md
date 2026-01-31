@@ -1,18 +1,22 @@
-# Bodybag 
-[![Bodybag Script for FiveM](https://media.istockphoto.com/id/1227596477/photo/corpse-body-bag-isolated.jpg?s=612x612&w=0&k=20&c=t6SaYf75Ftdz5K2_3a-aBvJ4_ag9H2kUbhltE5PmbMQ=)](https://youtu.be/QSaue2GBnYQ)
+# Bodybag
 
-This is a standalone bodybag script that I made for FiveM, it's quite basic for now but I hope to implement a feature for a coroner to come pick up the bodybag and take it to the morgue
+Standalone FiveM bodybag script created as an early experimental project.
 
-# Features
-- Configurable
-- Runs at 0.00/0.01ms
-- Standalone
+The script provides basic bodybag functionality for deceased players and was built to explore entity handling and player state management within FiveM.
 
-# Installation
-- Fill out the configuration file and drop into your resource folder
-- Start the resource in your server.cfg and enjoy.
+---
 
-# Support
-Add me on discord, devkayne if you require any assistance
+## Project Status
 
-Cheers! 🍻
+This project is **archived** and is not actively maintained.
+
+Issues, pull requests, and feature requests are not being monitored.  
+If you wish to modify or extend this project, please fork the repository.
+
+---
+
+## Usage
+
+This project is provided **as-is**.
+
+Permission to use, modify, or redistribute this code — including for commercial purposes — should be discussed directly with the author.
