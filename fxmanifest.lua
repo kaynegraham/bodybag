@@ -1,18 +1,19 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name 'devkayne'
-description 'Bodybag Script'
-version '1.0.0'
+name 'kg_bodybag'
+author 'devkayne'
+description 'Body bag resource - standalone FiveM'
+version '2.0.0'
 
 shared_scripts {
-    'shared/*.lua'
+    'shared/config.lua'
 }
 
 client_scripts {
-    'client/*.lua'
+    'client/client.lua'
 }
 
 server_scripts {
-    'server/*.lua'
+    'server/server.lua'
 }
